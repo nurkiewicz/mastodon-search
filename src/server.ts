@@ -18,7 +18,7 @@ const pool = new Pool({
 
 const port: number = 3000;
 
-let server = express()
+let app = express()
     .get('/', (req: Request, res: Response) => {
         res.send({'hello': 'world'});
     })
@@ -64,9 +64,6 @@ let server = express()
             numbers.push(i);
         }
         res.json(numbers);
-    })
-    .listen(port, () => {
-        console.log(`Server running at http://localhost:${port}`);
     });
 
-export default server;
+export { app, pool}
