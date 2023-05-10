@@ -16,8 +16,6 @@ const pool = new Pool({
     connectionTimeoutMillis: 2000,
 });
 
-const port: number = 3000;
-
 let app = express()
     .get('/', (req: Request, res: Response) => {
         res.send({'hello': 'world'});
