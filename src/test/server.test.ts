@@ -1,8 +1,31 @@
 import request from 'supertest';
-import {app, pool} from '../server';
+import {appBuilder, pool} from '../server';
+import {PostgreSqlContainer} from "testcontainers";
+import {StartedPostgreSqlContainer} from "testcontainers/dist/src/modules/postgresql/postgresql-container";
+import {Express} from "express";
 
 
-afterAll(() => pool.end());
+let container: StartedPostgreSqlContainer;
+let app: Express;
+
+beforeAll(async () => {
+    container = await new PostgreSqlContainer().start();
+    app = appBuilder({
+        user: container.getUsername(),
+        host: container.getHost(),
+        database: container.getDatabase(),
+        password: container.getPassword(),
+        port: container.getPort(),
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+    })
+})
+
+afterAll(async () => {
+    await pool.end();
+    await container.stop();
+});
 
 describe('Test endpoints', () => {
 
