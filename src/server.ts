@@ -3,6 +3,7 @@ import axios from 'axios';
 import fs from 'fs';
 
 import {Pool, PoolConfig, QueryResult} from 'pg';
+import knex, {Knex} from "knex";
 
 // create a connection pool
 const pool = new Pool({
@@ -18,6 +19,14 @@ const pool = new Pool({
 
 function appBuilder(poolConfig: PoolConfig) {
     const pool = new Pool(poolConfig)
+    knex({
+        client: 'pg',
+        connection: `postgresql://${poolConfig.user}:${poolConfig.password}@${poolConfig.host}:${poolConfig.port}/${poolConfig.database}`,
+        migrations: {
+            directory: './db/migrations',
+            tableName: 'knex_migrations'
+        }
+    }).migrate.latest();
     return express()
         .get('/', (req: Request, res: Response) => {
             res.send({'hello': 'world'});
@@ -68,4 +77,4 @@ function appBuilder(poolConfig: PoolConfig) {
 }
 
 
-export { appBuilder, pool}
+export {appBuilder, pool}
