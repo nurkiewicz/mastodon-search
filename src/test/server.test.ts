@@ -10,7 +10,7 @@ let app: Express;
 
 beforeAll(async () => {
     container = await new PostgreSqlContainer().start();
-    app = appBuilder({
+    app = await appBuilder({
         user: container.getUsername(),
         host: container.getHost(),
         database: container.getDatabase(),
@@ -20,7 +20,7 @@ beforeAll(async () => {
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
     })
-})
+}, 10000);
 
 afterAll(async () => {
     await pool.end();

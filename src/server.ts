@@ -2,8 +2,8 @@ import express, {Request, Response} from 'express';
 import axios from 'axios';
 import fs from 'fs';
 
-import {Pool, PoolConfig, QueryResult} from 'pg';
-import knex, {Knex} from "knex";
+import {Pool, PoolConfig} from 'pg';
+import knex from "knex";
 
 // create a connection pool
 const pool = new Pool({
@@ -17,14 +17,14 @@ const pool = new Pool({
     connectionTimeoutMillis: 2000,
 });
 
-function appBuilder(poolConfig: PoolConfig) {
+async function appBuilder(poolConfig: PoolConfig) {
     const pool = new Pool(poolConfig)
-    knex({
+    await knex({
         client: 'pg',
         connection: `postgresql://${poolConfig.user}:${poolConfig.password}@${poolConfig.host}:${poolConfig.port}/${poolConfig.database}`,
         migrations: {
             directory: './db/migrations',
-            tableName: 'knex_migrations'
+            tableName: 'knex_migrations',
         }
     }).migrate.latest();
     return express()

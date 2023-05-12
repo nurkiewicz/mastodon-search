@@ -14,7 +14,7 @@ const pool: PoolConfig = {
     connectionTimeoutMillis: 2000,
 };
 
-appBuilder(pool)
-    .listen(port, () => {
+appBuilder(pool).then(app =>
+    app.listen(port, () => {
         console.log(`Server running at http://localhost:${port}`);
-    });
+    }));
