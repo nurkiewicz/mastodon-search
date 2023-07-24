@@ -1,5 +1,6 @@
 import {appBuilder} from './server'
-import {Pool, PoolConfig} from "pg";
+import {PoolConfig} from "pg";
+import {default as EventSource} from "eventsource";
 
 const port = 3000;
 
@@ -16,5 +17,21 @@ const pool: PoolConfig = {
 
 appBuilder(pool).then(app =>
     app.listen(port, () => {
+        const eventSource = new EventSource('https://mstdn.social/api/v1/streaming/public');
+        eventSource.onerror = (err: MessageEvent<any>) => {
+            console.error('Error occurred:', err);
+        };
+        eventSource.onopen = () => {
+            console.log("Connected")
+        };
+
+        function parse(e: MessageEvent<any>) {
+            const eventData = JSON.parse(e.data);
+            console.log(e.type, eventData);
+        }
+
+        ['update', 'delete', 'status.update'].forEach(name =>
+            eventSource.addEventListener(name, parse)
+        );
         console.log(`Server running at http://localhost:${port}`);
     }));
