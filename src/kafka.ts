@@ -1,5 +1,6 @@
 import {Consumer, EachMessagePayload, Kafka, Partitioners} from 'kafkajs';
 import {Toot} from "./toot";
+import {putDocument} from "./elasticsearch";
 
 type EventType = 'update' | 'delete' | 'status.update';
 
@@ -48,6 +49,7 @@ async function consumeMessages(topic: string) {
                     case "update":
                         const tootObj: Toot = toot;
                         console.log('Toot posted', offset, tootObj);
+                        await putDocument("toots", tootObj.id, tootObj);
                         break;
                     case "status.update":
                         console.log('Toot updated', offset, toot);

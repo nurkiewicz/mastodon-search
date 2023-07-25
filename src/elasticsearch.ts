@@ -1,0 +1,19 @@
+import {Client} from '@elastic/elasticsearch';
+
+export {putDocument}
+
+// Create an Elasticsearch client instance
+const client = new Client({node: 'http://localhost:9200'}); // Replace with your Elasticsearch server address
+
+async function putDocument(index: string, id: string, document: Record<string, any>) {
+    try {
+        const response = await client.index({
+            index,
+            id,
+            document
+        });
+        console.log(`Document indexed successfully. Index: ${response._index}, ID: ${response._id}`);
+    } catch (error) {
+        console.error('Error indexing document:', error);
+    }
+}
