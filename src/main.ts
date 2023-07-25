@@ -2,6 +2,8 @@ import {appBuilder} from './server'
 import {PoolConfig} from "pg";
 import {default as EventSource} from "eventsource";
 
+import {sendMessage, consumeMessages, EventType} from "./kafka"
+
 const port = 3000;
 
 const pool: PoolConfig = {
@@ -21,17 +23,16 @@ appBuilder(pool).then(app =>
         eventSource.onerror = (err: MessageEvent<any>) => {
             console.error('Error occurred:', err);
         };
-        eventSource.onopen = () => {
-            console.log("Connected")
-        };
+        eventSource.onopen = () => console.log("Connected to Mastodon SSE");
 
-        function parse(e: MessageEvent<any>) {
-            const eventData = JSON.parse(e.data);
-            console.log(e.type, eventData);
+        function parse(type: EventType, e: MessageEvent<any>) {
+            sendMessage('raw_toots', type, e.data);
         }
 
-        ['update', 'delete', 'status.update'].forEach(name =>
-            eventSource.addEventListener(name, parse)
+        consumeMessages('raw_toots');
+
+        ['update', 'delete', 'status.update'].forEach(type =>
+            eventSource.addEventListener(type, e => parse(type as EventType, e))
         );
         console.log(`Server running at http://localhost:${port}`);
     }));

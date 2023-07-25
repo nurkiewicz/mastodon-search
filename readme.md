@@ -1,3 +1,7 @@
 ```bash
-docker run -e POSTGRES_PASSWORD=postgres --name postgres -p 5432:5432 postgres
+docker exec -it masearch_kafka \
+  /opt/kafka/bin/kafka-console-consumer.sh \
+  --topic raw_toots \
+  --bootstrap-server localhost:9092 \
+  --from-beginning
 ```

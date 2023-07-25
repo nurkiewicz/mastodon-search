@@ -2,7 +2,33 @@ version: '3'
 services:
   postgres:
     image: postgres
+    container_name: masearch_postgres
     ports:
       - '5432:5432'
     environment:
       - POSTGRES_PASSWORD=postgres
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: masearch_zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: masearch_kafka
+    ports:
+      - "9092:9092"  # Port for outside listener (host machine)
+      - "9093:9093"  # Port for inside listener (Kafka service)
+    depends_on:
+      - masearch_zookeeper
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: masearch_zookeeper:2181
+      KAFKA_CREATE_TOPICS: "raw_toots:1:1"

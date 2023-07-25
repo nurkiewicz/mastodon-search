@@ -25,9 +25,11 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@types/kafkajs": "^1.9.0",
     "axios": "^1.3.6",
     "eventsource": "^2.0.2",
     "express": "^4.17.1",
+    "kafkajs": "^2.2.4",
     "knex": "^2.4.2",
     "pg": "^8.10.0",
     "pg-pool": "^3.6.0"
