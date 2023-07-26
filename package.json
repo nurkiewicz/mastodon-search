@@ -27,7 +27,6 @@
   "dependencies": {
     "@elastic/elasticsearch": "^8.8.1",
     "@types/elasticsearch": "^5.0.40",
-    "@types/kafkajs": "^1.9.0",
     "axios": "^1.3.6",
     "eventsource": "^2.0.2",
     "express": "^4.17.1",

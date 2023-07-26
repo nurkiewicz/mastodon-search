@@ -1,30 +1,30 @@
 import request from 'supertest';
 import {appBuilder, pool} from '../server';
-import {PostgreSqlContainer} from "testcontainers";
-import {StartedPostgreSqlContainer} from "testcontainers/dist/src/modules/postgresql/postgresql-container";
+import {DockerComposeEnvironment, StartedDockerComposeEnvironment} from "testcontainers";
 import {Express} from "express";
 
 
-let container: StartedPostgreSqlContainer;
+let environment: StartedDockerComposeEnvironment | null;
 let app: Express;
 
 beforeAll(async () => {
-    container = await new PostgreSqlContainer().start();
+    environment = await new DockerComposeEnvironment('.', 'docker-compose.yml').up();
+    const container = environment.getContainer("masearch_postgres");
     app = await appBuilder({
-        user: container.getUsername(),
-        host: container.getHost(),
-        database: container.getDatabase(),
-        password: container.getPassword(),
-        port: container.getPort(),
+        user: 'postgres',
+        host: 'localhost',
+        database: 'postgres',
+        password: 'postgres',
+        port: container.getMappedPort(5432),
         max: 20,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
     })
-}, 10000);
+}, 60000);
 
 afterAll(async () => {
     await pool.end();
-    await container.stop();
+    await environment?.stop();
 });
 
 describe('Test endpoints', () => {
