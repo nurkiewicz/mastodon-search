@@ -30,6 +30,12 @@ async function sendMessage(topic: string, type: EventType, message: string) {
 }
 
 
+function parseToot(value: Buffer): Toot {
+    const toot: Toot = JSON.parse(value.toString());
+    toot.domain = toot.account.acct?.match(/@(.+)/)?.[1] || null;
+    return toot;
+}
+
 async function consumeMessages(topic: string) {
     const kafka = new Kafka({
         clientId: 'masearch-consumer',
@@ -44,18 +50,17 @@ async function consumeMessages(topic: string) {
         eachMessage: async (payload: EachMessagePayload) => {
             const {offset, headers , value} = payload.message;
             if(value) {
-                const toot = JSON.parse(value.toString());
                 switch(headers?.type?.toString() as EventType) {
                     case "update":
-                        const tootObj: Toot = toot;
-                        console.log('Toot posted', offset, tootObj);
+                        const tootObj = parseToot(value);
                         await putDocument("toots", tootObj.id, tootObj);
                         break;
                     case "status.update":
-                        console.log('Toot updated', offset, toot);
+                        const tootObj2 = parseToot(value);
+                        await putDocument("toots", tootObj2.id, tootObj2);
                         break;
                     case "delete":
-                        console.log('Toot deleted', offset, toot);
+                        // await deleteDocument("toots", toot.toString())
                         break;
                     default:
                         console.log('Huh?');

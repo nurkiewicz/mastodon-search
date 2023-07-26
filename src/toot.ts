@@ -2,6 +2,7 @@ export {Toot};
 
 interface Toot {
     id: string;
+    domain: string | null;
     created_at: string | null;
     in_reply_to_id: string | null;
     in_reply_to_account_id: string | null;
