@@ -20,12 +20,12 @@ beforeAll(async () => {
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
     })
-}, 60000);
+}, 30000);
 
 afterAll(async () => {
     await pool.end();
     await environment?.stop();
-});
+}, 30000);
 
 describe('Test endpoints', () => {
 
