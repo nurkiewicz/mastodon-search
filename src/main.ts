@@ -1,7 +1,7 @@
 import {appBuilder} from './server'
 import {PoolConfig} from "pg";
 import {default as EventSource} from "eventsource";
-
+import {Logger} from 'pino';
 import {sendMessage, consumeMessages, EventType} from "./kafka"
 
 const port = 3000;

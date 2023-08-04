@@ -8,7 +8,11 @@ let environment: StartedDockerComposeEnvironment | null;
 let app: Express;
 
 beforeAll(async () => {
-    environment = await new DockerComposeEnvironment('.', 'docker-compose.yml').up();
+    environment = await new DockerComposeEnvironment('.', 'docker-compose.yml')
+        .withEnvironment({
+            DEBUG: 'testcontainers'
+        })
+        .up();
     const container = environment.getContainer("masearch_postgres");
     app = await appBuilder({
         user: 'postgres',
@@ -20,12 +24,12 @@ beforeAll(async () => {
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
     })
-}, 30000);
+}, 60000);
 
 afterAll(async () => {
     await pool.end();
     await environment?.stop();
-}, 30000);
+}, 60000);
 
 describe('Test endpoints', () => {
 
